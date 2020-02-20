@@ -10,7 +10,7 @@ The chemdash app is a simple analysis application built upon the plotly dash fra
 The included yml file should allow you to get started quite easily if you have anaconda installed.  
 
 ```
-conda create -f environment.yml
+conda env create -f environment.yml
 ```
 
 Alternatively you should be able to create an environment off the rdkit channel and then install the remaining dependencies.  
