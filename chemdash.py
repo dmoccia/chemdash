@@ -221,8 +221,8 @@ def get_columns_dropdown():
 
 
 #read in file with smiles and compound_id (optional)
-df = pd.read_csv("dataset_10k.csv")
-#df = df.head(250)
+df = pd.read_csv("dataset_800.csv")
+#df = df.head(1250)
 
 print ('There are ' + str(df.shape[0]) + ' compounds in your dataset')
 if all(x in df.columns for x in ['smiles', 'Compound_id']) and (df.shape[0]<10001):
