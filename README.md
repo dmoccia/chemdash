@@ -2,7 +2,7 @@
 Chemical Dataset Exploration Tool Built on Plotly Dash
 
 
-The chemdash app is a simple analysis application built upon the plotly dash framework.  As input the application takes a _csv_ file requiring both **smiles** and **Compound_id** fields, other fields will be retained and displayed in the data table portion of the application.  A UMAP (similar to t-SNE/PCA) plot will be generated as well as a Molecular Grid Map (MGM).   Depending on the column selection in the data table, a distribution plot for the given column will also be displayed.  Selection of data points in either the UMAP or MGM plot will result in filtering of the data table and highlighting within the distribution plot.  For more information on this demo app please check out [my blog post](https://cognitivedataworks.com/blog).
+The chemdash app is a simple analysis application built upon the plotly dash framework.  As input the application takes a _csv_ file requiring both **smiles** and **Compound_id** fields, other fields will be retained and displayed in the data table portion of the application.  A UMAP (similar to t-SNE/PCA) plot will be generated as well as a Molecular Grid Map (MGM).   Depending on the column selection in the data table, a distribution plot for the given column will also be displayed.  Selection of data points in either the UMAP or MGM plot will result in filtering of the data table and highlighting within the distribution plot.  For more information on this demo app please check out [my blog post](https://cognitivedataworks.com/2020/02/building-a-gan-compound-explorer-in-plotly-dash).
 
 ## Installation
 
