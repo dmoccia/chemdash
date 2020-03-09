@@ -183,14 +183,14 @@ def get_sc_figure(colorby, x, y):
     }
     return figure
 
-def get_sarm_graph():
+def get_mgm_graph():
 
-        sarm_graph = dcc.Graph(
-            id='sarm_graph',
+        mgm_graph = dcc.Graph(
+            id='mgm_graph',
             #config={'displayModeBar': True,},
         )
 
-        return sarm_graph
+        return mgm_graph
 
 
 def get_tsne_graph():
@@ -222,7 +222,8 @@ def get_columns_dropdown():
 
 #read in file with smiles and compound_id (optional)
 df = pd.read_csv("dataset_800.csv")
-#df = df.head(1250)
+#df = pd.read_csv("dataset_10k.csv")
+#df = df.head(2000)
 
 print ('There are ' + str(df.shape[0]) + ' compounds in your dataset')
 if all(x in df.columns for x in ['smiles', 'Compound_id']) and (df.shape[0]<10001):
@@ -265,7 +266,7 @@ if all(x in df.columns for x in ['smiles', 'Compound_id']) and (df.shape[0]<1000
                         value='MolecularWeight', clearable=False
                         ),
                 dcc.Tabs(id='tabs', children=[
-                dcc.Tab(label='MGM', id='sarm_tab', children=[get_sarm_graph()],
+                dcc.Tab(label='MGM', id='mgm_tab', children=[get_mgm_graph()],
                         ),
                 dcc.Tab(label='UMAP', id='umap_tab', children=[get_umap_graph()],
                         ),
@@ -281,7 +282,7 @@ if all(x in df.columns for x in ['smiles', 'Compound_id']) and (df.shape[0]<1000
 
 
     @app.callback(
-        [Output('sarm_graph', 'figure'),
+        [Output('mgm_graph', 'figure'),
          Output('umap_graph', 'figure')],
         [Input('color_by_dropdown', 'value')]
     )
@@ -291,10 +292,10 @@ if all(x in df.columns for x in ['smiles', 'Compound_id']) and (df.shape[0]<1000
     #bit of hack in order to let you switch between plots and select data
     #without first clearing the data on previous plot
     @app.callback(
-        [Output('sarm_graph','selectedData'),
+        [Output('mgm_graph','selectedData'),
          Output('umap_graph','selectedData')],
         [Input('tabs', 'value'),
-        Input('sarm_graph', 'clickData'),
+        Input('mgm_graph', 'clickData'),
         Input('umap_graph', 'clickData')
     ]
     )
@@ -304,7 +305,7 @@ if all(x in df.columns for x in ['smiles', 'Compound_id']) and (df.shape[0]<1000
 
     @app.callback(
         Output('data_table', 'data'),
-        [Input('sarm_graph', 'selectedData'),
+        [Input('mgm_graph', 'selectedData'),
         Input('umap_graph', 'selectedData'),
     ]
     )

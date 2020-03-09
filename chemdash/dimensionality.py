@@ -7,7 +7,7 @@ from scipy.spatial.distance import cdist
 import time
 import umap
 from sklearn import manifold
-
+#import hungarian
 
 def add_dummy_rows(df:pd.DataFrame, id_col:str, bit_columns:List) -> (np.ndarray, List):
 
@@ -86,6 +86,7 @@ def generate_lap_grid(df, x_col, y_col):
     print('lapjv')
     print(time.time())
     min_cost, row_assigns, col_assigns = lap.lapjv(np.copy(cost))
+    #row_assigns, col_assigns = hungarian.lap(np.copy(cost))
 
     grid_jv = grid[col_assigns]
     df_coords = pd.DataFrame(data=grid_jv, columns=['lap_x', 'lap_y'])
