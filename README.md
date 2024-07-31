@@ -10,7 +10,8 @@ Download the repository locally, then install the dependencies from the top of t
 
 ### Docker
 
-This works on most platforms, including Mac on Apple processors:
+This works on platforms that support docker:
+_Note: this works on Macs with Apple processors, but be sure to keep platform set to linux/amd64 so Intel-based packages work._
 ```
 docker buildx build --platform linux/amd64 -t chemdash:latest .
 ```
