@@ -1,0 +1,15 @@
+FROM continuumio/anaconda 
+
+RUN mkdir -p /opt/chemdash
+WORKDIR /opt/chemdash
+
+COPY ./requirements.txt /opt/chemdash/requirements.txt
+COPY ./environment.yml /opt/chemdash/environment.yml 
+RUN conda env create -f environment.yml 
+
+# Application code.  This updates most frequently but is a cheap rebuild. 
+COPY . /opt/chemdash
+
+# In production we override with gunicorn, etc. 
+ENTRYPOINT /opt/chemdash/chemdash.py
+

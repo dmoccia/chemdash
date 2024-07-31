@@ -1,0 +1,49 @@
+name: chemdash2 
+channels:
+  - rdkit
+  - defaults
+  - conda-forge
+  - conda-forge/label/libcxx_dev
+dependencies:
+  - python=3.10
+  - pip
+  - gcc
+  - gxx
+  - _anaconda_depends
+  - anaconda=custom
+  - anaconda-client
+  - anaconda-project
+  - cairo
+  - certifi
+  - curl
+  - cython
+  - fontconfig
+  - freetype
+  - keyring
+  - krb5
+  - libarchive
+  - libboost
+  - libcurl
+  - libcxx
+  - libedit
+  - libffi
+  - libgfortran
+  - libiconv
+  - liblief
+  - libpng
+  - libsodium
+  - libssh2
+  - libtiff
+  - libxml2
+  - libxslt
+  - llvm-openmp
+  - llvmlite
+  - ncurses
+  - networkx
+  - qt
+  - qtawesome
+  - qtconsole
+  - pip:
+    - -r requirements.txt
+prefix: /opt/anaconda3/envs/chemdash2
+
