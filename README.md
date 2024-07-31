@@ -10,17 +10,24 @@ Download the repository locally, then install the dependencies from the top of t
 
 ### Docker
 
-This works on most platforms, including Mac on Apple processors:
+This works on platforms that support docker:
+_Note: this works on Macs with Apple processors, but be sure to keep platform set to linux/amd64 so Intel-based packages work._
 ```
 docker buildx build --platform linux/amd64 -t chemdash:latest .
 ```
 
-To start chemdash:
+To start chemdash from the CLI:
 ```
-docker run --rm --name chemdash -p 8000:8000 -v /tmp:/tmp -v /var/tmp:/var/tmp chemdash:latest
+docker run --rm --name chemdash -p 8000:8000 -v /tmp:/tmp -v /var/tmp:/var/tmp -d chemdash:latest
 ```
 
-To stop it:
+Then open a browser while watching the logs in the terminal:
+```
+open http://0.0.0.0:8000
+docker logs -f chemdash
+```
+
+To stop it from the CLI:
 ```
 docker kill chemdash
 ```
@@ -46,12 +53,18 @@ python3.10 -m venv venv
 pip install -r requirements.txt
 ```
 
-
 To run, make sure your new environment is active and navigate to the directory containing _chemdash.py_ and run it.
 ```
 . venv/bin/activate
 python chemdash.py
 ```
+
+### PyCharm
+
+The repo contains two PyCharm run configurations, one for running in docker, and the other to work with a local venv.
+You make either of those as above, and then specify either `chemdash venv` or `chemdash docker` to run the respective way.
+
+NOTE: PyCharm debugging works best with the `chemdash venv` option.
 
 
 ## Data Loading
