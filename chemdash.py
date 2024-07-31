@@ -1,3 +1,11 @@
+#!/usr/bin/env python3
+
+# NOTE: When this was written originally, using python3.7, "fork" was the default start method for multiprocessing.
+# The code currently fails when using the start method "spawn", which is now the default.
+# Explicitly set this until the issue is resolved.
+import multiprocessing
+multiprocessing.set_start_method("fork")
+
 import os
 import pandas as pd
 import dash
@@ -9,7 +17,6 @@ import plotly
 import plotly.figure_factory as ff
 import time
 from functools import partial
-
 
 from dash.dependencies import Input, Output
 
@@ -367,6 +374,7 @@ else:
 
 
 if __name__ == '__main__':
-
-        app.run_server(debug=True)
-
+    port = 8000
+    print(f"Launching server: http://0.0.0.0:{port}")
+    app.run_server(host="0.0.0.0", port=port, debug=True)
+    print(f"Server exited.")
