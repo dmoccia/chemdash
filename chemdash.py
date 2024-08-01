@@ -4,7 +4,7 @@
 # The code currently fails when using the start method "spawn", which is now the default.
 # Explicitly set this until the issue is resolved.
 import multiprocessing
-multiprocessing.set_start_method("fork")
+from pathlib import Path
 
 import os
 import pandas as pd
@@ -30,6 +30,7 @@ from chemdash.dimensionality import separate_metadata, generate_lap_grid, \
     add_dummy_rows, generate_tsne, generate_umap
 
 from chemdash.multiprocess import parallelize_dataframe_func
+
 #test
 def prepare_data(df, fp_type='maccs', plot_type='umap'):
 
@@ -149,7 +150,7 @@ def get_table_layout(df):
 
     return table_layout
 
-def get_sc_figure(colorby, x, y):
+def get_sc_figure(df, colorby, x, y):
     figure = {
         'data': [
             go.Scattergl(
@@ -216,24 +217,26 @@ def get_umap_graph():
 
     return umap_graph
 
-def get_columns_dropdown():
+
+def get_columns_dropdown(df: pd.DataFrame):
     numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
     all_cols = df.select_dtypes(include=numerics).columns
-    all_cols
     cols_to_remove = ['tsne_x', 'tsne_y', 'lap_x', 'lap_y', 'id', 'umap_x', 'umap_y',]
     cols_to_keep = [x for x in all_cols if x not in cols_to_remove]
     cols_to_keep.sort()
     return cols_to_keep
 
 
+def create_dash_app(input_compound_csv_path: Path):
+    input_compound_csv_path = Path(input_compound_csv_path)
+    df = pd.read_csv(str(input_compound_csv_path))
 
-#read in file with smiles and compound_id (optional)
-df = pd.read_csv("dataset_800.csv")
-#df = pd.read_csv("dataset_10k.csv")
-#df = df.head(2000)
+    if not all(x in df.columns for x in ['smiles', 'Compound_id']):
+        raise ValueError('Your dataset needs to contain "smiles" and "Compound_id" columns!')
+    if df.shape[0] > 10000:
+        raise ValueError('This tool supports a maxiumum of 10k cpds!')
 
-print ('There are ' + str(df.shape[0]) + ' compounds in your dataset')
-if all(x in df.columns for x in ['smiles', 'Compound_id']) and (df.shape[0]<10001):
+    print ('There are ' + str(df.shape[0]) + ' compounds in your dataset')
 
     # create asset directory for mol image files
     if not os.path.isdir("assets/mol_images"):
@@ -241,7 +244,6 @@ if all(x in df.columns for x in ['smiles', 'Compound_id']) and (df.shape[0]<1000
 
     df = prepare_data(df)
     df['id'] = df.index
-
 
     app = dash.Dash(__name__, assets_folder='assets')
 
@@ -268,7 +270,7 @@ if all(x in df.columns for x in ['smiles', 'Compound_id']) and (df.shape[0]<1000
                 [dcc.Dropdown(
                         id='color_by_dropdown',
                         options=[
-                            {"label": i, "value": i} for i in get_columns_dropdown()
+                            {"label": i, "value": i} for i in get_columns_dropdown(df)
                             ],
                         value='MolecularWeight', clearable=False
                         ),
@@ -368,13 +370,21 @@ if all(x in df.columns for x in ['smiles', 'Compound_id']) and (df.shape[0]<1000
 
         return select_cols, fig
 
-
-else:
-    print ('Your dataset needs to contain "smiles" and "Compound_id" columns and a maximum of 10k cpds')
+    return app
 
 
 if __name__ == '__main__':
+    if 'FORKED' not in os.environ:
+        print("Setting FORKED")
+        os.environ['FORKED'] = '1'
+    else:
+        print("Subprocess fork detected")
+
+    # app = build_app_for_compound_data_file("dataset_10k.csv")
+    multiprocessing.set_start_method("spawn")
+    app = create_dash_app("dataset_800.csv")
     port = 8000
-    print(f"Launching server: http://0.0.0.0:{port}")
-    app.run_server(host="0.0.0.0", port=port, debug=True)
+    debug = False
+    print(f"Launching server: http://0.0.0.0:{port}, debug: {debug}")
+    app.run_server(host="0.0.0.0", port=port, debug=debug)
     print(f"Server exited.")
