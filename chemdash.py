@@ -394,6 +394,5 @@ def main(
 if __name__ == '__main__':
     # NOTE: THe parallelization logic in prepare() will re-load this module in sub-processes,
     # All "real work" is done in this block, with the main module body doing only definitions!
-    import sys
-    print(f"ARGV: {sys.argv}")
-    #typer.run(main)
+    typer.run(main)
+
