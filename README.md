@@ -61,7 +61,7 @@ python3 ./chemdash.py dataset_800.csv --port 8000 --debug
 
 ### PyCharm
 
-The repo contains two PyCharm run configurations, one for running in docker, and the other to work with a local venv.
+The repo contains two PyCharm run configurations, both of which use the venv, each with differen test datasets. 
 You make either of those as above, and then specify either `chemdash venv` or `chemdash docker` to run the respective way.
 
 NOTE: PyCharm debugging works best with the `chemdash venv` option.
