@@ -88,7 +88,6 @@ def prepare_data(df, fp_type='maccs', plot_type='umap'):
 
     print('Done Cleaning')
     t4 = time.time(); e4 = t4 - t3
-    print(f"{e4} ({t4}")
     print(f"elapsed: {e4} ({t4})")
 
     return df
