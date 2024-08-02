@@ -35,15 +35,16 @@ MAX_COMPOUNDS = 10000
 def prepare_data(df, fp_type='maccs', plot_type='umap'):
     print('canonicalizing smiles')
     t0 = time.time()
-    print(t0)
+    print(f"Start time: {t0}")
     df['canon_smiles'] = df_canonicalize_from_smiles(df, 'smiles')
     print('converting to mols')
     t1 = time.time(); e1 = t1 - t0
-    print(t1)
+    print(f"elapsed: {e1} ({t1})")
     df['mol'] = df_smiles_to_rdkit_mol(df, 'canon_smiles')
     print('generating images')
     t2 = time.time(); e2 = t2 - t1
     print(f"{e2} ({t2}")
+    print(f"elapsed: {e2} ({t2})")
 
     df['Structure'] = parallelize_dataframe_func(df, partial(
         df_get_image_file_url, mol_col='mol', id_col='Compound_id'))
@@ -59,6 +60,9 @@ def prepare_data(df, fp_type='maccs', plot_type='umap'):
     #create Molecular Descriptor object and calc descriptors on the df
     print ('calc mol descriptors')
     print(time.time())
+    t3 = time.time(); e3 = t3 - t2
+    print(f"elapsed: {e3} ({t3})")
+
     md = MolecularDescriptors(mol_field='mol', smiles_field='canon_smiles', id_field='Compound_id')
     df = md.generate_descriptors(df)
 
@@ -83,7 +87,10 @@ def prepare_data(df, fp_type='maccs', plot_type='umap'):
     df = df[df['Compound_id'] != 'Placeholder'].reset_index(drop=True)
 
     print('Done Cleaning')
-    print(time.time())
+    t4 = time.time(); e4 = t4 - t3
+    print(f"{e4} ({t4}")
+    print(f"elapsed: {e4} ({t4})")
+
     return df
 
 
