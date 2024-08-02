@@ -25,5 +25,6 @@ RUN python3 -m pip install -r requirements.txt
 COPY . /opt/chemdash
 
 # In production we override with gunicorn, etc. 
-ENTRYPOINT /opt/chemdash/chemdash.py
+ENTRYPOINT ["/opt/chemdash/chemdash.py"]
+CMD ["--help"]
 

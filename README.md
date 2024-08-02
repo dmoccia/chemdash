@@ -18,7 +18,7 @@ docker buildx build --platform linux/amd64 -t chemdash:latest .
 
 To start chemdash from the CLI:
 ```
-docker run --rm --name chemdash -p 8000:8000 -v /tmp:/tmp -v /var/tmp:/var/tmp -d chemdash:latest
+docker run --rm --name chemdash -p 8000:8000 -v /tmp:/tmp -v /var/tmp:/var/tmp -d chemdash:latest dataset_800.csv  --port 8000 --debug 
 ```
 
 Then open a browser while watching the logs in the terminal:
@@ -47,7 +47,7 @@ Install non-python dependencies on Mac:
 ```
 
 Install the python dependencies in a virtualenv:
-```
+``
 python3.10 -m venv venv
 . ./venv/bin/activate
 pip install -r requirements.txt
@@ -56,7 +56,7 @@ pip install -r requirements.txt
 To run, make sure your new environment is active and navigate to the directory containing _chemdash.py_ and run it.
 ```
 . venv/bin/activate
-python chemdash.py
+python3 ./chemdash.py dataset_800.csv --port 8000 --debug
 ```
 
 ### PyCharm

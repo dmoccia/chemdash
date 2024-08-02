@@ -1,21 +1,18 @@
 #!/usr/bin/env python3
 
-# NOTE: When this was written originally, using python3.7, "fork" was the default start method for multiprocessing.
-# The code currently fails when using the start method "spawn", which is now the default.
-# Explicitly set this until the issue is resolved.
-import multiprocessing
-from pathlib import Path
-
 import os
+from pathlib import Path
 import pandas as pd
 import dash
-import dash_table
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import dash_table
+from dash import dcc
+from dash import html
 import plotly.graph_objs as go
 import plotly
 import plotly.figure_factory as ff
 import time
+import typer
+
 from functools import partial
 
 from dash.dependencies import Input, Output
@@ -23,7 +20,7 @@ from dash.dependencies import Input, Output
 from typing import List
 
 from chemdash.chemistry import df_canonicalize_from_smiles, df_smiles_to_rdkit_mol, \
-    df_get_image_file_url, df_add_ecfp_1024_4_fps, df_add_maccs_fps, df_create_image_file
+    df_get_image_file_url, df_add_ecfp_1024_4_fps, df_add_maccs_fps
 
 from chemdash.molecular_descriptors import MolecularDescriptors
 from chemdash.dimensionality import separate_metadata, generate_lap_grid, \
@@ -31,23 +28,25 @@ from chemdash.dimensionality import separate_metadata, generate_lap_grid, \
 
 from chemdash.multiprocess import parallelize_dataframe_func
 
-#test
-def prepare_data(df, fp_type='maccs', plot_type='umap'):
 
-    print ('canonicalizing smiles')
-    print (time.time())
+MAX_COMPOUNDS = 10000
+
+
+def prepare_data(df, fp_type='maccs', plot_type='umap'):
+    print('canonicalizing smiles')
+    t0 = time.time()
+    print(t0)
     df['canon_smiles'] = df_canonicalize_from_smiles(df, 'smiles')
     print('converting to mols')
-    print(time.time())
+    t1 = time.time(); e1 = t1 - t0
+    print(t1)
     df['mol'] = df_smiles_to_rdkit_mol(df, 'canon_smiles')
     print('generating images')
-    print(time.time())
-
-
+    t2 = time.time(); e2 = t2 - t1
+    print(f"{e2} ({t2}")
 
     df['Structure'] = parallelize_dataframe_func(df, partial(
         df_get_image_file_url, mol_col='mol', id_col='Compound_id'))
-
 
     if fp_type == 'maccs':
         print ('creating fingerprints')
@@ -150,6 +149,7 @@ def get_table_layout(df):
 
     return table_layout
 
+
 def get_sc_figure(df, colorby, x, y):
     figure = {
         'data': [
@@ -209,6 +209,7 @@ def get_tsne_graph():
 
     return tsne_graph
 
+
 def get_umap_graph():
     umap_graph = dcc.Graph(
         id='umap_graph',
@@ -227,24 +228,7 @@ def get_columns_dropdown(df: pd.DataFrame):
     return cols_to_keep
 
 
-def create_dash_app(input_compound_csv_path: Path):
-    input_compound_csv_path = Path(input_compound_csv_path)
-    df = pd.read_csv(str(input_compound_csv_path))
-
-    if not all(x in df.columns for x in ['smiles', 'Compound_id']):
-        raise ValueError('Your dataset needs to contain "smiles" and "Compound_id" columns!')
-    if df.shape[0] > 10000:
-        raise ValueError('This tool supports a maxiumum of 10k cpds!')
-
-    print ('There are ' + str(df.shape[0]) + ' compounds in your dataset')
-
-    # create asset directory for mol image files
-    if not os.path.isdir("assets/mol_images"):
-        os.mkdir('assets/mol_images')
-
-    df = prepare_data(df)
-    df['id'] = df.index
-
+def create_chemdash_app(df: pd.DataFrame):
     app = dash.Dash(__name__, assets_folder='assets')
 
     #useful when trying to get callbacks sorted out...
@@ -296,7 +280,7 @@ def create_dash_app(input_compound_csv_path: Path):
         [Input('color_by_dropdown', 'value')]
     )
     def generate_scatter_figs(colorby):
-        return get_sc_figure(colorby, 'lap_x', 'lap_y'), get_sc_figure(colorby, 'umap_x', 'umap_y')
+        return get_sc_figure(df, colorby, 'lap_x', 'lap_y'), get_sc_figure(df, colorby, 'umap_x', 'umap_y')
 
     #bit of hack in order to let you switch between plots and select data
     #without first clearing the data on previous plot
@@ -373,18 +357,43 @@ def create_dash_app(input_compound_csv_path: Path):
     return app
 
 
-if __name__ == '__main__':
-    if 'FORKED' not in os.environ:
-        print("Setting FORKED")
-        os.environ['FORKED'] = '1'
-    else:
-        print("Subprocess fork detected")
+def main(
+    input_file: Path,
+    port: int = 8000,
+    debug: bool = False
+):
+    """
+    Run the chemdash server.
 
-    # app = build_app_for_compound_data_file("dataset_10k.csv")
-    multiprocessing.set_start_method("spawn")
-    app = create_dash_app("dataset_800.csv")
-    port = 8000
-    debug = False
-    print(f"Launching server: http://0.0.0.0:{port}, debug: {debug}")
+    :param input_file: Path to the input file of compounds.
+    :param port: Port number to use (default is 8000).
+    :param debug: Debug mode (default is False).
+    """
+    df = pd.read_csv(str(input_file))
+    if not all(x in df.columns for x in ['smiles', 'Compound_id']):
+        raise ValueError('Your dataset needs to contain "smiles" and "Compound_id" columns!')
+    if df.shape[0] > MAX_COMPOUNDS:
+        raise ValueError('This tool supports a maxiumum of 10k compounds!')
+
+    typer.echo('There are ' + str(df.shape[0]) + ' compounds in your dataset')
+
+    # create asset directory for mol image files
+    if not os.path.isdir("assets/mol_images"):
+        os.mkdir('assets/mol_images')
+
+    df = prepare_data(df)
+    df['id'] = df.index
+
+    app = create_chemdash_app(df)
+
+    typer.echo(f"Launching server: http://0.0.0.0:{port}, debug: {debug}")
     app.run_server(host="0.0.0.0", port=port, debug=debug)
-    print(f"Server exited.")
+    typer.echo(f"Server exited.")
+
+
+if __name__ == '__main__':
+    # NOTE: THe parallelization logic in prepare() will re-load this module in sub-processes,
+    # All "real work" is done in this block, with the main module body doing only definitions!
+    import sys
+    print(f"ARGV: {sys.argv}")
+    #typer.run(main)
