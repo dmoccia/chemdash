@@ -16,10 +16,8 @@ ENV PIP_ROOT_USER_ACTION=ignore
 ENV PIP_NO_CACHE_DIR=off
 
 # These two have a dependency resolution order problem.  Handle manually though they are also in requirements.txt
-RUN python3 -m pip install numpy==1.26.4
-RUN python3 -m pip install cython
-RUN python3 -m pip install -e git+https://github.com/gatagat/lap.git@v0.4.0#egg=lap
 RUN python3 -m pip install -r requirements.txt
+RUN python3 -m pip install -e git+https://github.com/gatagat/lap.git@v0.4.0#egg=lap
 
 # Application code.  This updates most frequently but is a cheap rebuild. 
 COPY . /opt/chemdash

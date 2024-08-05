@@ -88,9 +88,8 @@ jupyterlab
 jupyterlab-server
 keyring
 kiwisolver
-lap==0.4.0; platform_machine == "x86_64"
--e git+https://github.com/gatagat/lap.git@v0.4.0#egg=lap
-lapjv==1.3.27; platform_machine == "x86_64"
+# -e git+https://github.com/gatagat/lap.git@v0.4.0#egg=lap  # NOTE: install manually after this whole file
+# lapjv==1.3.27; platform_machine == "x86_64"
 lazy-object-proxy
 libarchive-c
 lief
