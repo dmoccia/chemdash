@@ -15,7 +15,9 @@ COPY ./requirements.txt /opt/chemdash/requirements.txt
 ENV PIP_ROOT_USER_ACTION=ignore
 ENV PIP_NO_CACHE_DIR=off
 
-# These two have a dependency resolution order problem.  Handle manually though they are also in requirements.txt
+# We have to install lap from github, and if put into the requirmemts.txt file it gets confused about its deps on numpy.
+# Install everything except LAP, then add LAP directly.
+# NOTE: lap is slow, and we need to replace it.
 RUN python3 -m pip install -r requirements.txt
 RUN python3 -m pip install -e git+https://github.com/gatagat/lap.git@v0.4.0#egg=lap
 
