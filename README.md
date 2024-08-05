@@ -51,6 +51,7 @@ Install the python dependencies in a virtualenv:
 python3.10 -m venv venv
 . ./venv/bin/activate
 pip install -r requirements.txt
+-e git+https://github.com/gatagat/lap.git@v0.4.0#egg=lap
 ```
 
 To run, make sure your new environment is active and navigate to the directory containing _chemdash.py_ and run it.
