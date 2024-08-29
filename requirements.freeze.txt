@@ -85,7 +85,7 @@ jupyter-console==6.6.3
 jupyter-core==5.7.2
 jupyter==1.0.0
 jupyterlab-server==2.27.3
-jupyterlab==4.2.4
+jupyterlab==4.2.5
 keyring==25.2.1
 kiwisolver==1.4.5
 lap==0.4.0; platform_machine == "x86_64"
